@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-container">
+    <h1>My Profile</h1>
+    <p>Update your personal information below. Your role as a <strong>{{ user.profile.role }}</strong> cannot be changed.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Account Details</legend>
+            {{ user_form.as_p }}
+        </fieldset>
+        <fieldset>
+            <legend>Profile Details</legend>
+            {{ profile_form.as_p }}
+        </fieldset>
+        <button type="submit" class="btn">Update Profile</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Active Campaigns</h1>
+    <p>Invest in the future of Bahrain's businesses.</p>
+</div>
+
+<div class="card-container">
+    {% for funding in fundings %}
+        <a href="{% url 'funding_detail' funding.id %}" class="card-link">
+            <div class="card">
+                <div class="card-content">
+                    <h2>{{ funding.campaign_name }}</h2>
+                    <p class="company-name">{{ funding.company.company_name }}</p>
+                    <p>{{ funding.description|truncatewords:20 }}</p>
+                    
+                    <div class="progress-bar">
+                        <div class="progress"></div>
+                    </div>
+                    <div class="metrics">
+                        <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>
+                        <span>{{ funding.progress_percentage|floatformat:1 }}% Funded</span>
+                    </div>
+                    </div>
+            </div>
+        </a>
+    {% empty %}
+        <p>There are no active campaigns at the moment.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
