@@ -130,6 +130,36 @@ class CompanyCreate(LoginRequiredMixin, CreateView):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
+class CompanyUpdate(LoginRequiredMixin, UpdateView):
+    model = Company
+    form_class = CompanyForm
+    template_name = 'company/company_form.html'
+    success_url = '/fundings/' # Redirect to dashboard after update
+
+    def get_object(self):
+        # This ensures the user can only edit their own company
+        return self.request.user.company
+
+class CompanyDelete(LoginRequiredMixin, DeleteView):
+    model = Company
+    template_name = 'company/company_confirm_delete.html'
+    success_url = '/' # Redirect to home page after successful deletion
+
+    def get_object(self):
+        # This ensures the user can only access their own company's delete page
+        return self.request.user.company
+    
+    def post(self, request, *args, **kwargs):
+        company = self.get_object()
+        # Check if any funding campaign for this company has investments
+        for funding in company.funding_set.all():
+            if funding.total_invested() > 0:
+                messages.error(request, 'Cannot delete company with active investments in its campaigns.')
+                return redirect('company_detail', pk=company.pk)
+        
+        # If the check passes, proceed with deletion
+        messages.success(request, f'Company "{company.company_name}" has been deleted.')
+        return super().post(request, *args, **kwargs)
  
 def signup(request):
     error_message = ''
