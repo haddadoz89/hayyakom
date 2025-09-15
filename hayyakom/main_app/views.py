@@ -126,7 +126,7 @@ class FundingDetail(DetailView):
 
 class FundingCreate(LoginRequiredMixin, CreateView):
     model = Funding
-    fields = ['campaign_name', 'description', 'goal', 'end_date']
+    fields = ['campaign_name', 'description', 'goal', 'end_date', 'category']
     template_name = 'fundings/funding_form.html'
 
     def form_valid(self, form):
@@ -136,7 +136,7 @@ class FundingCreate(LoginRequiredMixin, CreateView):
 
 class FundingUpdate(LoginRequiredMixin, UpdateView):
     model = Funding
-    fields = ['campaign_name', 'description', 'end_date']
+    fields = ['campaign_name', 'description', 'end_date', 'category']
     template_name = 'fundings/funding_form.html'
 
 class FundingDelete(LoginRequiredMixin, DeleteView):
