@@ -90,3 +90,15 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user.username}: {self.message[:30]}"
+
+class Milestone(models.Model):
+    funding = models.ForeignKey(Funding, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    target_date = models.DateField()
+    is_complete = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['target_date']
+
+    def __str__(self):
+        return f"{self.title} for {self.funding.campaign_name}"

@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Funding, Company, Investment, Profile, Notification
 from django.contrib.auth import login
-from .forms import CompanyForm, CustomSignUpForm, InvestmentForm, UserUpdateForm, ProfileUpdateForm, FundingFilterForm
+from .forms import CompanyForm, CustomSignUpForm, InvestmentForm, UserUpdateForm, ProfileUpdateForm, FundingFilterForm, MilestoneForm 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
