@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="detail-container">
+    <div class="detail-header">
+        <h1>{{ company.company_name }}</h1>
+        <h2>CR Number: {{ company.cr_number }}</h2>
+    </div>
+
+    <div class="detail-actions">
+        <a href="{% url 'company_update' %}" class="btn">Edit Company</a>
+        <a href="{% url 'company_delete' %}" class="btn btn-danger">Delete Company</a>
+    </div>
+    
+    <hr>
+
+    <div class="campaign-list">
+        <h2>All Funding Campaigns for this Company</h2>
+<div class.card-container">
+    {% for funding in company.funding_set.all %}
+        <a href="{% url 'funding_detail' funding.id %}" class="card-link">
+            <div class="card">
+                <div class="card-content">
+                    <h3>{{ funding.campaign_name }}</h3>
+                    
+                    <label>Campaign Progress:</label>
+                    <div class="progress-bar">
+                        <div class="progress">
+                            {{ funding.progress_percentage|floatformat:2 }}%
+                        </div>
+                    </div>
+                    <div class="metrics">
+                        <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>
+                        <span><strong>Status:</strong> {{ funding.status }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    {% empty %}
+        <p>This company has no funding campaigns.</p>
+    {% endfor %}
+</div>
+    </div>
+</div>
+
+{% endblock %}

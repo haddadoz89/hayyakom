@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-container">
+    <h1>Invest in: {{ funding.campaign_name }}</h1>
+    <p>Please enter your investment amount (Min: 2000 BD, Max: 5000 BD).</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Confirm Investment</button>
+    </form>
+</div>
+
+{% endblock %}

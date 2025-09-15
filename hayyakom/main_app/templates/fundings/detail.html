@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="detail-container">
+    <div class="detail-header">
+        <h1>{{ object.campaign_name }}</h1>
+        <h2>From: {{ object.company.company_name }}</h2>
+    </div>
+    
+    <div class="detail-content">
+        <h3>Project Goal</h3>
+        <p class="goal">BHD {{ object.goal }}</p>
+
+        <h3>Description</h3>
+        <p>{{ object.description }}</p>
+
+        <h3>Campaign Ends On</h3>
+        <p>{{ object.end_date }}</p>
+    </div>
+
+    {% if is_investor %}
+        <hr>
+        <div class="contact-info">
+            <h3>Owner Contact Information</h3>
+            <p>You can contact the business owner with any questions.</p>
+            <ul>
+                <li><strong>Owner Name:</strong> {{ object.company.owner.first_name }} {{ object.company.owner.last_name }}</li>
+                <li><strong>Email:</strong> {{ object.company.owner.email }}</li>
+                <li><strong>Phone:</strong> {{ object.company.owner.profile.phone_number }}</li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if user == object.company.owner %}
+    <hr>
+    <div class="investor-list">
+        <h3>Investors in this Campaign</h3>
+    <table class="data-table"> <!-- <--- Add the class here -->
+        <thead>
+            <tr>
+                <th>Investor Name</th>
+                <th>Amount Invested (BD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for investment in object.investment_set.all %}
+            <tr>
+                <td>{{ investment.investor.first_name }} {{ investment.investor.last_name }}</td>
+                <td>{{ investment.amount }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2">There are no investors for this campaign yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% endif %}
+    <div class="detail-actions">
+        {% if user == object.company.owner %}
+            <a href="{% url 'funding_update' object.id %}" class="btn">Edit Campaign</a>
+            <a href="{% url 'funding_delete' object.id %}" class="btn btn-danger">Delete Campaign</a>
+        {% elif user.is_authenticated and user.profile.role == 'Investor' %}
+            <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

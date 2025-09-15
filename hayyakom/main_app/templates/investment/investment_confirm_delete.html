@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-container">
+    <h1>Delete Investment</h1>
+    <p>Are you sure you want to delete your investment of <strong>{{ object.amount }} BD</strong> in the campaign "{{ object.funding.campaign_name }}"?</p>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <a href="{% url 'funding_list' %}" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    </form>
+</div>
+
+{% endblock %}
