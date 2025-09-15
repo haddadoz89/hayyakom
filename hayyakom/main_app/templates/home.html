@@ -6,13 +6,22 @@
     <p>Invest in the future of Bahrain's businesses.</p>
 </div>
 
+<form method="get" class="filter-form">
+    {{ form.as_p }}
+    <button type="submit" class="btn">Filter</button>
+</form>
+
 <div class="card-container">
     {% for funding in fundings %}
         <a href="{% url 'funding_detail' funding.id %}" class="card-link">
             <div class="card">
                 <div class="card-content">
                     <h2>{{ funding.campaign_name }}</h2>
-                    <p class="company-name">{{ funding.company.company_name }}</p>
+
+                    <a href="{% url 'company_detail' funding.company.id %}">
+                        <p class="company-name">{{ funding.company.company_name }}</p>
+                    </a>
+
                     <p>{{ funding.description|truncatewords:20 }}</p>
                     
                     <div class="progress-bar">
@@ -20,13 +29,13 @@
                     </div>
                     <div class="metrics">
                         <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>
-                        <span>{{ funding.progress_percentage|floatformat:1 }}% Funded</span>
+                        <span>{{ funding.progress_percentage|floatformat:2 }}% Funded</span>
                     </div>
-                    </div>
+                </div>
             </div>
         </a>
     {% empty %}
-        <p>There are no active campaigns at the moment.</p>
+        <p>No campaigns match your search criteria.</p>
     {% endfor %}
 </div>
 
