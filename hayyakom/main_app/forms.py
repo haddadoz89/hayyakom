@@ -1,7 +1,5 @@
-# main_app/forms.py
-
 from django.forms import ModelForm
-from .models import Company, Investment, Profile
+from .models import Company, Investment, Profile, CATEGORY_CHOICES
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
@@ -41,3 +39,17 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['phone_number']
+
+class FundingFilterForm(forms.Form):
+    CATEGORY_CHOICES_WITH_ALL = (('', 'All Categories'),) + CATEGORY_CHOICES
+
+    query = forms.CharField(
+        label='Search by name',
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Campaign name...'})
+    )
+
+    category = forms.ChoiceField(
+        choices=CATEGORY_CHOICES_WITH_ALL,
+        required=False
+    )
