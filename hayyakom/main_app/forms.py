@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Company, Investment, Profile, CATEGORY_CHOICES
+from .models import Company, Investment, Profile, CATEGORY_CHOICES, Milestone
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
@@ -53,3 +53,9 @@ class FundingFilterForm(forms.Form):
         choices=CATEGORY_CHOICES_WITH_ALL,
         required=False
     )
+
+class MilestoneForm(forms.ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ['title', 'target_date']
+        widgets = {'target_date': forms.DateInput(attrs={'type': 'date'}),}

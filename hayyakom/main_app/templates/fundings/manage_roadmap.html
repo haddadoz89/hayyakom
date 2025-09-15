@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Manage Roadmap for "{{ funding.campaign_name }}"</h1>
+</div>
+
+<div class="form-container">
+    <h3>Add New Milestone</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Add Milestone</button>
+    </form>
+</div>
+
+<div class="roadmap-list">
+    <h3>Current Roadmap</h3>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Milestone</th>
+                <th>Target Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for milestone in milestones %}
+            <tr>
+                <td>{{ milestone.title }}</td>
+                <td>{{ milestone.target_date }}</td>
+                <td>{% if milestone.is_complete %}✅ Complete{% else %}⏳ Pending{% endif %}</td>
+                <td>
+                    {% if not milestone.is_complete %}
+                    <form action="{% url 'mark_milestone_complete' milestone.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-small">Mark as Complete</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No milestones have been added to this roadmap yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

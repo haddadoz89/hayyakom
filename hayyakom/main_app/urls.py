@@ -19,4 +19,6 @@ urlpatterns = [
     path('investment/<int:pk>/update/', views.InvestmentUpdate.as_view(), name='investment_update'),
     path('investment/<int:pk>/delete/', views.InvestmentDelete.as_view(), name='investment_delete'),
     path('accounts/signup/', views.signup, name='signup'),
+    path('fundings/<int:funding_id>/manage_roadmap/', views.manage_roadmap, name='manage_roadmap'),
+    path('milestones/<int:milestone_id>/complete/', views.mark_milestone_complete, name='mark_milestone_complete'),
 ]
