@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>My Notifications</h1>
+</div>
+
+<div class="notification-container">
+    {% for notification in object_list %}
+        <div class="notification-item {% if not notification.is_read %}notification-unread{% endif %}">
+            <p>{{ notification.message }}</p>
+            <small>{{ notification.created_at|timesince }} ago</small>
+            {% if notification.related_funding %}
+                <a href="{% url 'funding_detail' notification.related_funding.id %}" class="btn-small">View Campaign</a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>You have no notifications.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
