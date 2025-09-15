@@ -20,15 +20,14 @@
             <a href="{% url 'company_detail' user.company.id %}" class="btn">View Company Details & Campaigns</a>
         </div>
     {% endif %}
-
 {% else %}
     <div class="investor-dashboard">
         <h2>My Investments</h2>
-        <table class="data-table">...</table>
+        <table class="data-table">
+            </table>
         <hr>
         
         <h2>All Active Campaigns</h2>
-
         <form method="get" class="filter-form">
             {{ form.as_p }}
             <button type="submit" class="btn">Filter</button>
@@ -46,7 +45,9 @@
                 {% for funding in object_list %}
                 <tr>
                     <td><a href="{% url 'funding_detail' funding.id %}">{{ funding.campaign_name }}</a></td>
-                    <td>{{ funding.company.company_name }}</td>
+                    
+                    <td><a href="{% url 'company_detail' funding.company.id %}">{{ funding.company.company_name }}</a></td>
+                    
                     <td>{{ funding.goal }}</td>
                     <td>
                         <div class="progress-bar">
