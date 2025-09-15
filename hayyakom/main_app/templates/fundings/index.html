@@ -24,44 +24,46 @@
 {% else %}
     <div class="investor-dashboard">
         <h2>My Investments</h2>
+        <table class="data-table">...</table>
+        <hr>
+        
+        <h2>All Active Campaigns</h2>
+
+        <form method="get" class="filter-form">
+            {{ form.as_p }}
+            <button type="submit" class="btn">Filter</button>
+        </form>
         <table class="data-table">
             <thead>
                 <tr>
                     <th>Campaign Name</th>
-                    <th>My Investment (BD)</th>
-                    <th>Campaign Progress</th>
-                    <th>Actions</th>
+                    <th>Company</th>
+                    <th>Funding Goal (BD)</th>
+                    <th>Progress</th>
                 </tr>
             </thead>
             <tbody>
-                {% for investment in user.investment_set.all %}
+                {% for funding in object_list %}
                 <tr>
-                    <td><a href="{% url 'funding_detail' investment.funding.id %}">{{ investment.funding.campaign_name }}</a></td>
-                    <td>{{ investment.amount }}</td>
+                    <td><a href="{% url 'funding_detail' funding.id %}">{{ funding.campaign_name }}</a></td>
+                    <td>{{ funding.company.company_name }}</td>
+                    <td>{{ funding.goal }}</td>
                     <td>
                         <div class="progress-bar">
                             <div class="progress">
-                                {{ investment.funding.progress_percentage|floatformat:2 }}%
+                                {{ funding.progress_percentage|floatformat:2 }}%
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        {% if investment.funding.status == 'In Process' %}
-                            <a href="{% url 'investment_update' investment.id %}" class="btn-small">Edit</a>
-                            <a href="{% url 'investment_delete' investment.id %}" class="btn-small btn-danger">Delete</a>
-                        {% else %}
-                            <span>N/A</span>
-                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4">You have not made any investments yet.</td>
+                    <td colspan="4">No campaigns match your search criteria.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% endif %}
+{% endif %}
 
 {% endblock %}
