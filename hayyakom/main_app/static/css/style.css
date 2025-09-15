@@ -370,3 +370,13 @@ main {
         gap: 0.25rem;
     }
 }
+
+.company-name a, .detail-header a {
+    text-decoration: none;
+    color: inherit; /* This makes the link take the color of its parent text */
+}
+
+.company-name a:hover, .detail-header a:hover {
+    text-decoration: underline;
+    color: var(--primary-color);
+}
