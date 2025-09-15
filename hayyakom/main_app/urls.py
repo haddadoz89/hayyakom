@@ -9,7 +9,6 @@ urlpatterns = [
     path('fundings/create/', views.FundingCreate.as_view(), name='funding_create'),
     path('fundings/<int:pk>/', views.FundingDetail.as_view(), name='funding_detail'),
     path('fundings/<int:pk>/update/', views.FundingUpdate.as_view(), name='funding_update'),
-    path('fundings/<int:pk>/delete/', views.FundingDelete.as_view(), name='funding_delete'),
     path('company/create/', views.CompanyCreate.as_view(), name='company_create'),
     path('company/<int:pk>/', views.CompanyDetail.as_view(), name='company_detail'),
     path('company/update/', views.CompanyUpdate.as_view(), name='company_update'),

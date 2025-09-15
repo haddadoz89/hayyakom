@@ -24,6 +24,14 @@
         <p>{{ object.end_date }}</p>
     </div>
 
+    <div class="detail-actions">
+    {% if user == object.company.owner %}
+        <a href="{% url 'funding_update' object.id %}" class="btn">Edit Campaign</a>
+        {% elif user.is_authenticated and user.profile.role == 'Investor' %}
+        <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
+    {% endif %}
+    </div>
+
     {% if is_investor %}
         <hr>
         <div class="contact-info">

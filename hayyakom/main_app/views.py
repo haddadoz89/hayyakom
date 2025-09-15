@@ -136,19 +136,8 @@ class FundingCreate(LoginRequiredMixin, CreateView):
 
 class FundingUpdate(LoginRequiredMixin, UpdateView):
     model = Funding
-    fields = ['campaign_name', 'description', 'end_date', 'category']
+    fields = ['campaign_name', 'description', 'goal', 'end_date', 'category']
     template_name = 'fundings/funding_form.html'
-
-class FundingDelete(LoginRequiredMixin, DeleteView):
-    model = Funding
-    success_url = '/fundings/'
-    template_name = 'fundings/funding_confirm_delete.html'
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object.investment_set.count() > 0:
-            messages.error(request, 'Cannot delete a campaign that has active investments.')
-            return redirect('funding_detail', pk=self.object.pk)        
-        return super().post(request, *args, **kwargs)
 
 @login_required
 def add_investment(request, funding_id):
