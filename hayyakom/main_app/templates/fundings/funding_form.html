@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="form-container">
+    {% if object %}
+        <h1>Edit {{ object.campaign_name }}</h1>
+    {% else %}
+        <h1>Create a New Campaign</h1>
+    {% endif %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+            {{ form.as_table }}
+        </table>
+        <button type="submit" class="btn">Submit</button>
+    </form>
+</div>
+
+{% endblock %}

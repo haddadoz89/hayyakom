@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>My Dashboard</h1>
+</div>
+
+{% if user.profile.role == 'Owner' %}
+    {% if not user.company %}
+        <div class="form-container">
+            <h2>Welcome, Business Owner!</h2>
+            <p>You need to create a company profile before you can add a funding campaign.</p>
+            <a href="{% url 'company_create' %}" class="btn">Create Company Profile</a>
+        </div>
+    {% else %}
+        <div class="company-info-card">
+            <h2>My Company</h2>
+            <p><strong>Name:</strong> {{ user.company.company_name }}</p>
+            <p><strong>CR Number:</strong> {{ user.company.cr_number }}</p>
+            <a href="{% url 'company_detail' user.company.id %}" class="btn">View Company Details & Campaigns</a>
+        </div>
+    {% endif %}
+
+{% else %}
+    <div class="investor-dashboard">
+        <h2>My Investments</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Campaign Name</th>
+                    <th>My Investment (BD)</th>
+                    <th>Campaign Progress</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for investment in user.investment_set.all %}
+                <tr>
+                    <td><a href="{% url 'funding_detail' investment.funding.id %}">{{ investment.funding.campaign_name }}</a></td>
+                    <td>{{ investment.amount }}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress">
+                                {{ investment.funding.progress_percentage|floatformat:2 }}%
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if investment.funding.status == 'In Process' %}
+                            <a href="{% url 'investment_update' investment.id %}" class="btn-small">Edit</a>
+                            <a href="{% url 'investment_delete' investment.id %}" class="btn-small btn-danger">Delete</a>
+                        {% else %}
+                            <span>N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">You have not made any investments yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+{% endblock %}
