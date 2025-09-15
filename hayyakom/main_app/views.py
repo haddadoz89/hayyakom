@@ -346,3 +346,45 @@ def profile(request):
         'profile_form': profile_form
     }
     return render(request, 'profile.html', context)
+
+@login_required
+def manage_roadmap(request, funding_id):
+    funding = get_object_or_404(Funding, id=funding_id)
+    if request.user != funding.company.owner:
+        raise PermissionDenied
+    if request.method == 'POST':
+        form = MilestoneForm(request.POST)
+        if form.is_valid():
+            new_milestone = form.save(commit=False)
+            new_milestone.funding = funding
+            new_milestone.save()
+            messages.success(request, 'New milestone added successfully!')
+            return redirect('manage_roadmap', funding_id=funding.id)
+    else:
+        form = MilestoneForm()
+
+    milestones = funding.milestone_set.all()
+    context = {'funding': funding, 'milestones': milestones, 'form': form}
+    return render(request, 'funding/manage_roadmap.html', context)
+
+@login_required
+def mark_milestone_complete(request, milestone_id):
+    milestone = get_object_or_404(Milestone, id=milestone_id)
+    if request.user != milestone.funding.company.owner:
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        milestone.is_complete = True
+        milestone.save()
+
+        investments = milestone.funding.investment_set.all()
+        for investment in investments:
+            Notification.objects.create(
+                user=investment.investor,
+                message=f"A milestone has been completed for '{milestone.funding.campaign_name}': {milestone.title}",
+                related_funding=milestone.funding
+            )
+        
+        messages.success(request, f'Milestone "{milestone.title}" marked as complete!')
+    
+    return redirect('manage_roadmap', funding_id=milestone.funding.id)
