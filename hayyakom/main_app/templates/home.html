@@ -25,7 +25,7 @@
                     <p>{{ funding.description|truncatewords:20 }}</p>
                     
                     <div class="progress-bar">
-                        <div class="progress"></div>
+                        <div class="progress" style="width: {{ funding.progress_percentage }}%;"></div>
                     </div>
                     <div class="metrics">
                         <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>

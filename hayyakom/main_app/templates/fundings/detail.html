@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+{% include 'partials/messages.html' %}
 
 <div class="detail-container">
     <div class="detail-header">
@@ -8,13 +9,14 @@
     </div>
 
     <div class="progress-bar">
-        <div class="progress"></div>
+        <div class="progress" style="width: {{ object.progress_percentage }}%;"></div>
     </div>
     <div class="metrics">
         <span><strong>Goal:</strong> BHD {{ object.goal }}</span>
         <span>{{ object.progress_percentage|floatformat:2 }}% Funded</span>
     </div>
     <hr>
+    
     <div class="detail-content">
         <h3>Description</h3>
         <p>{{ object.description }}</p>

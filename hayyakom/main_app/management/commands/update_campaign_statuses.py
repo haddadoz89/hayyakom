@@ -6,7 +6,10 @@ class Command(BaseCommand):
     help = 'Updates the status of campaigns that have passed their end date.'
 
     def handle(self, *args, **options):
+        # Get the current date
         today = timezone.now().date()
+        
+        # Find all campaigns that are still "In Process" but their end date has passed
         expired_campaigns = Funding.objects.filter(status='In Process', end_date__lt=today)
         
         self.stdout.write(f'Found {expired_campaigns.count()} expired campaigns to process...')
@@ -14,8 +17,10 @@ class Command(BaseCommand):
         completed_count = 0
         failed_count = 0
 
+        # Loop through the expired campaigns
         for campaign in expired_campaigns:
             if campaign.total_invested() >= campaign.goal:
+                # --- Handle successful campaigns ---
                 campaign.status = 'Completed'
                 completed_count += 1
                 
@@ -28,8 +33,8 @@ class Command(BaseCommand):
                         message=f"Good news! The campaign '{campaign.campaign_name}' was successful. Your investment of {investment.amount} BD has been collected.",
                         related_funding=campaign
                     )
-
             else:
+                # --- Handle failed campaigns ---
                 campaign.status = 'Failed'
                 failed_count += 1
                 
@@ -37,15 +42,16 @@ class Command(BaseCommand):
                 for investment in investments_to_return:
                     investment.status = 'Returned'
                     investment.save()
-                    
                     Notification.objects.create(
                         user=investment.investor,
                         message=f"The campaign '{campaign.campaign_name}' did not meet its goal. Your investment of {investment.amount} BD has been marked as returned.",
                         related_funding=campaign
                     )
             
+            # Save the updated campaign status
             campaign.save()
 
+        # Print a final success message to the terminal
         self.stdout.write(self.style.SUCCESS(
             f'Processing complete. Marked {completed_count} as Completed and {failed_count} as Failed.'
         ))

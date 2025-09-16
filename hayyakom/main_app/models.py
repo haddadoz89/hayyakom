@@ -2,7 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.db.models import Sum
-
+# ============================================================================
+# Choices Tuples
+# ============================================================================
 STATUS_CHOICES = (
     ('In Process', 'In Process'),
     ('Completed', 'Completed'),
@@ -23,14 +25,16 @@ CATEGORY_CHOICES = (
     ('Arts & Culture', 'Arts & Culture'),
     ('Other', 'Other'),
 )
-
+# ============================================================================
+# User & Company Models
+# ============================================================================
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=[('Owner', 'Owner'), ('Investor', 'Investor')])
     phone_number = models.CharField(max_length=20)
 
     def __str__(self):
-        return f"{self.user.first_name} ({self.role})"
+        return f"{self.user.first_name or self.user.username} ({self.role})"
 
 class Company(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -39,7 +43,9 @@ class Company(models.Model):
 
     def __str__(self):
         return self.company_name
-
+# ============================================================================
+# Funding & Investment Models
+# ============================================================================
 class Funding(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     campaign_name = models.CharField(max_length=200)
@@ -55,6 +61,7 @@ class Funding(models.Model):
 
     def get_absolute_url(self):
         return reverse('funding_detail', kwargs={'pk': self.id})
+
     def total_invested(self):
         result = self.investment_set.aggregate(total=Sum('amount'))
         return result['total'] or 0
@@ -73,6 +80,7 @@ class Investment(models.Model):
     def __str__(self):
         return f"{self.amount} by {self.investor.first_name} for {self.funding.campaign_name}"
 
+# NOTE: The Transaction model is not currently used in any views,
 class Transaction(models.Model):
     investment = models.ForeignKey(Investment, on_delete=models.CASCADE)
     amount = models.IntegerField()
@@ -80,9 +88,11 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"Transaction of {self.amount} for {self.investment.funding.campaign_name}"
-
+# ============================================================================
+# Feature-Specific Models
+# ============================================================================
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE) # The user who receives the notification
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
