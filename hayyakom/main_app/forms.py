@@ -1,14 +1,10 @@
-from django.forms import ModelForm
-from .models import Company, Investment, Profile, CATEGORY_CHOICES, Milestone
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django import forms
-
-class CompanyForm(ModelForm):
-  class Meta:
-    model = Company
-    fields = ['company_name', 'cr_number']
-
+from .models import Company, Investment, Profile, Milestone, CATEGORY_CHOICES
+# ============================================================================
+# User & Auth Forms
+# ============================================================================
 class CustomSignUpForm(UserCreationForm):
     role = forms.ChoiceField(choices=[('Owner', 'Business Owner'), ('Investor', 'Investor')])
     phone_number = forms.CharField(max_length=20, label="Phone Number")
@@ -16,6 +12,37 @@ class CustomSignUpForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = User
         fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',)
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['phone_number']
+# ============================================================================
+# Company Forms
+# ============================================================================
+class CompanyForm(forms.ModelForm):
+    class Meta:
+        model = Company
+        fields = ['company_name', 'cr_number']
+# ============================================================================
+# Funding & Investment Forms
+# ============================================================================
+class FundingFilterForm(forms.Form):
+    CATEGORY_CHOICES_WITH_ALL = (('', 'All Categories'),) + CATEGORY_CHOICES
+    query = forms.CharField(
+        label='Search by name',
+        required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Campaign or company name...'})
+    )
+    category = forms.ChoiceField(
+        choices=CATEGORY_CHOICES_WITH_ALL,
+        required=False
+    )
 
 class InvestmentForm(forms.ModelForm):
     class Meta:
@@ -29,33 +56,13 @@ class InvestmentForm(forms.ModelForm):
         if amount > 5000:
             raise forms.ValidationError("The maximum investment is 5000 BD.")
         return amount
-    
-class UserUpdateForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'email']
-
-class ProfileUpdateForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        fields = ['phone_number']
-
-class FundingFilterForm(forms.Form):
-    CATEGORY_CHOICES_WITH_ALL = (('', 'All Categories'),) + CATEGORY_CHOICES
-
-    query = forms.CharField(
-        label='Search by name',
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Campaign name...'})
-    )
-
-    category = forms.ChoiceField(
-        choices=CATEGORY_CHOICES_WITH_ALL,
-        required=False
-    )
-
+# ============================================================================
+# Milestone Form
+# ============================================================================
 class MilestoneForm(forms.ModelForm):
     class Meta:
         model = Milestone
         fields = ['title', 'target_date']
-        widgets = {'target_date': forms.DateInput(attrs={'type': 'date'}),}
+        widgets = {
+            'target_date': forms.DateInput(attrs={'type': 'date'}),
+        }
