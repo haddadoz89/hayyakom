@@ -1,3 +1,4 @@
+from datetime import timedelta, timezone
 from django.contrib import admin
 from .models import Profile, Company, Funding, Investment, Notification, Milestone
 
@@ -15,13 +16,14 @@ class CompanyAdmin(admin.ModelAdmin):
 @admin.register(Funding)
 class FundingAdmin(admin.ModelAdmin):
     list_filter = ('is_approved', 'status', 'category')
-    list_display = ('campaign_name', 'company', 'status', 'is_approved', 'goal')
+    list_display = ('campaign_name', 'company', 'status', 'is_approved', 'goal', 'reveal_date')
     search_fields = ('campaign_name', 'company__company_name')
-    actions = ['approve_campaigns']
+    actions = ['approve_campaigns', 'add_to_next_pulse']
 
     def approve_campaigns(self, request, queryset):
         for campaign in queryset:
             campaign.is_approved = True
+            campaign.status = 'Pending Pulse'
             campaign.save()
             Notification.objects.create(
                 user=campaign.company.owner,
@@ -30,6 +32,20 @@ class FundingAdmin(admin.ModelAdmin):
             )
     
     approve_campaigns.short_description = "Approve selected campaigns"
+
+    def add_to_next_pulse(self, request, queryset):
+        today = timezone.now().date()
+        days_until_sunday = (6 - today.weekday()) % 7
+        next_sunday = today + timedelta(days=days_until_sunday)
+
+        updated_count = queryset.update(
+            status='In Pulse',
+            reveal_date=next_sunday
+        )
+        
+        self.message_user(request, f'{updated_count} campaigns have been added to the Weekly Pulse for {next_sunday.strftime("%b %d, %Y")}.')
+
+    add_to_next_pulse.short_description = "Add selected campaigns to next Pulse"    
 
 @admin.register(Investment)
 class InvestmentAdmin(admin.ModelAdmin):

@@ -6,6 +6,10 @@ from django.db.models import Sum
 # Choices Tuples
 # ============================================================================
 STATUS_CHOICES = (
+    ('Pending Approval', 'Pending Approval'),
+    ('Pending Pulse', 'Pending Pulse'),
+    ('In Pulse', 'In Pulse'),
+    ('Early Access', 'Early Access'),
     ('In Process', 'In Process'),
     ('Completed', 'Completed'),
     ('Failed', 'Failed'),
@@ -53,9 +57,11 @@ class Funding(models.Model):
     description = models.TextField()
     goal = models.IntegerField()
     end_date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Process')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending Approval')
     is_approved = models.BooleanField(default=False)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Other')
+    interested_users = models.ManyToManyField(User, related_name='interested_campaigns', blank=True)
+    reveal_date = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.campaign_name
@@ -70,6 +76,12 @@ class Funding(models.Model):
     def progress_percentage(self):
         if self.goal > 0:
             return (self.total_invested() / self.goal) * 100
+        return 0
+    def interest_progress_percentage(self):
+        target = 10
+        count = self.interested_users.count()
+        if target > 0:
+            return (count / target) * 100
         return 0
 
 class Investment(models.Model):

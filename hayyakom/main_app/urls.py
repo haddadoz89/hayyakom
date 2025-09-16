@@ -25,6 +25,9 @@ urlpatterns = [
     # --- Roadmap & Milestone URLs ---
     path('fundings/<int:funding_id>/manage_roadmap/', views.manage_roadmap, name='manage_roadmap'),
     path('milestones/<int:milestone_id>/complete/', views.mark_milestone_complete, name='mark_milestone_complete'),
+    # --- weekly_pulse ---
+    path('pulse/', views.weekly_pulse, name='weekly_pulse'),
+    path('pulse/<int:funding_id>/show_interest/', views.show_interest, name='show_interest'),
     # --- Auth URLs ---
     path('accounts/signup/', views.signup, name='signup'),
 ]

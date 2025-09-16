@@ -12,6 +12,8 @@ from django.http import Http404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Funding, Company, Investment, Milestone, Profile, Notification
+from django.utils import timezone
+from datetime import timedelta
 from .forms import (
     CompanyForm, CustomSignUpForm, InvestmentForm, UserUpdateForm, 
     ProfileUpdateForm, FundingFilterForm, MilestoneForm
@@ -374,3 +376,30 @@ def mark_milestone_complete(request, milestone_id):
                 )
         messages.success(request, f'Milestone "{milestone.title}" marked as complete!')
     return redirect('manage_roadmap', funding_id=milestone.funding.id)
+# ============================================================================
+# Weekly pulse
+# ============================================================================
+def weekly_pulse(request):
+
+    today = timezone.now().date()
+    days_since_sunday = (today.weekday() + 1) % 7
+    current_sunday = today - timedelta(days=days_since_sunday)
+    
+    pulse_campaigns = Funding.objects.filter(
+        status='In Pulse',
+        reveal_date=current_sunday
+    )
+
+    context = {
+        'pulse_campaigns': pulse_campaigns,
+        'today': today,
+        'current_sunday': current_sunday,
+    }
+    return render(request, 'pulse/weekly_pulse.html', context)
+@login_required
+def show_interest(request, funding_id):
+    if request.method == 'POST':
+        funding = get_object_or_404(Funding, id=funding_id)
+        # Add the current user to the list of interested users
+        funding.interested_users.add(request.user)
+    return redirect('weekly_pulse')

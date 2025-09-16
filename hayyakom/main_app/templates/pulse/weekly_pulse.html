@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Hayyakom Weekly Pulse</h1>
+    <p>Discover this week's most promising new ventures. Show your interest to unlock details and gain early access.</p>
+</div>
+
+<div class="card-container">
+    {% for funding in pulse_campaigns %}
+        <div class="card">
+            <div class="card-content">
+                <h2>{{ funding.campaign_name }}</h2>
+                <p>{{ funding.description|truncatewords:20 }}</p>
+
+                {% if today.weekday >= 0 and today.weekday <= 2 %}
+                    <div class="interest-section">
+                        <label>Interest to Unlock:</label>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: {{ funding.interest_progress_percentage }}%;">
+                                {{ funding.interested_users.count }} / 10
+                            </div>
+                        </div>
+                        {% if user.is_authenticated %}
+                            {% if user in funding.interested_users.all %}
+                                <p class="success-text">✅ You've shown interest!</p>
+                            {% else %}
+                                <form action="{% url 'show_interest' funding.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-small">Show Interest</button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <p><a href="{% url 'login' %}?next={% url 'weekly_pulse' %}">Log in to show interest</a></p>
+                        {% endif %}
+                    </div>
+                
+                {% elif today.weekday == 3 %}
+                    <p>Early Access is now open for interested investors!</p>
+                
+                {% elif today.weekday >= 4 %}
+                    <p>This campaign is now live for all investors.</p>
+                    <a href="{% url 'funding_detail' funding.id %}" class="btn">View & Invest</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <div class="card"><div class="card-content"><p>This week's pulse has not been scheduled yet. Check back on Sunday for the reveal!</p></div></div>
+    {% endfor %}
+</div>
+
+{% endblock %}
