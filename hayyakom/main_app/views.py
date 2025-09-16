@@ -5,13 +5,14 @@ from django.contrib import messages
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Funding, Company, Investment, Profile, Notification
+from .models import Funding, Company, Investment, Milestone, Profile, Notification
 from django.contrib.auth import login
 from .forms import CompanyForm, CustomSignUpForm, InvestmentForm, UserUpdateForm, ProfileUpdateForm, FundingFilterForm, MilestoneForm 
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 @login_required
@@ -365,7 +366,7 @@ def manage_roadmap(request, funding_id):
 
     milestones = funding.milestone_set.all()
     context = {'funding': funding, 'milestones': milestones, 'form': form}
-    return render(request, 'funding/manage_roadmap.html', context)
+    return render(request, 'fundings/manage_roadmap.html', context)
 
 @login_required
 def mark_milestone_complete(request, milestone_id):

@@ -380,3 +380,34 @@ main {
     text-decoration: underline;
     color: var(--primary-color);
 }
+
+.detail-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.detail-main-content {
+    flex: 3;
+    min-width: 300px;
+}
+
+.detail-sidebar {
+    flex: 1;
+    min-width: 250px;
+}
+
+.roadmap-display ul {
+    list-style: none;
+    padding: 0;
+}
+
+.roadmap-display li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.roadmap-display li.complete {
+    text-decoration: line-through;
+    color: #888;
+}
