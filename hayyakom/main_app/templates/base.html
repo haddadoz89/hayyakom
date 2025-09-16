@@ -14,6 +14,7 @@
     <nav>
         <a href="{% url 'home' %}" class="logo">hayyakom</a>
         <ul>
+            <li><a href="{% url 'weekly_pulse' %}">Weekly Pulse</a></li>
             {% if user.is_authenticated %}
                 <li>
                     <a href="{% url 'notification_list' %}" class="notification-link">
