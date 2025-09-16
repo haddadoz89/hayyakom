@@ -23,6 +23,7 @@ CATEGORY_CHOICES = (
     ('Retail', 'Retail'),
     ('Health & Wellness', 'Health & Wellness'),
     ('Arts & Culture', 'Arts & Culture'),
+    ('Business', 'Business'),
     ('Other', 'Other'),
 )
 # ============================================================================
@@ -80,14 +81,6 @@ class Investment(models.Model):
     def __str__(self):
         return f"{self.amount} by {self.investor.first_name} for {self.funding.campaign_name}"
 
-# NOTE: The Transaction model is not currently used in any views,
-class Transaction(models.Model):
-    investment = models.ForeignKey(Investment, on_delete=models.CASCADE)
-    amount = models.IntegerField()
-    transaction_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Transaction of {self.amount} for {self.investment.funding.campaign_name}"
 # ============================================================================
 # Feature-Specific Models
 # ============================================================================
