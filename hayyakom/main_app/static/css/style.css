@@ -84,9 +84,9 @@ main {
 
 /* --- 4. Cards and Grids --- */
 .card-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 }
 
 .card {
@@ -96,7 +96,6 @@ main {
     overflow: hidden;
     transition: transform 0.2s;
     display: flex;
-    flex-direction: column;
 }
 
 .card:hover {
@@ -106,6 +105,8 @@ main {
 .card-link {
     text-decoration: none;
     color: inherit;
+    display: flex;
+    /* flex: 1 1 300px; */
 }
 
 .card-content {

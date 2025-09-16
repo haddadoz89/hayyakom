@@ -6,6 +6,7 @@ click==8.2.1
 colorama==0.4.6
 distlib==0.4.0
 Django==5.2.5
+dotenv==0.9.9
 filelock==3.19.1
 Flask==3.1.2
 idna==3.10
