@@ -23,44 +23,70 @@
         <p>{{ object.end_date }}</p>
     </div>
 
-    <div class="detail-actions">
-    {% if user == object.company.owner %}
-        {% if object.status == 'Completed' %}
-        <a href="{% url 'manage_roadmap' object.id %}" class="btn">Manage Roadmap</a>
-        {% endif %}
-        <a href="{% url 'funding_update' object.id %}" class="btn">Edit Campaign</a>
-        {% elif user.is_authenticated and user.profile.role == 'Investor' %}
-        <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
-    {% endif %}
-    
-    {% if object.milestone_set.all %}
-    <hr>
-    <div class="roadmap-display">
-        <h3>Project Roadmap</h3>
-        <ul>
-            {% for milestone in object.milestone_set.all %}
-            <li class="{% if milestone.is_complete %}complete{% endif %}">
-                <strong>{{ milestone.title }}</strong> (Target: {{ milestone.target_date }})
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-    </div>
-
     {% if is_investor %}
         <hr>
         <div class="contact-info">
-            </div>
+            <h3>Owner Contact Information</h3>
+            <p>You can contact the business owner with any questions.</p>
+            <ul>
+                <li><strong>Owner Name:</strong> {{ object.company.owner.first_name }} {{ object.company.owner.last_name }}</li>
+                <li><strong>Email:</strong> {{ object.company.owner.email }}</li>
+                <li><strong>Phone:</strong> {{ object.company.owner.profile.phone_number }}</li>
+            </ul>
+        </div>
     {% endif %}
 
     {% if user == object.company.owner %}
         <hr>
         <div class="investor-list">
-            </div>
-    {% endif %}
-    <div class="detail-actions">
+            <h3>Investors in this Campaign</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Investor Name</th>
+                        <th>Amount Invested (BD)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for investment in object.investment_set.all %}
+                    <tr>
+                        <td>{{ investment.investor.first_name }} {{ investment.investor.last_name }}</td>
+                        <td>{{ investment.amount }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2">There are no investors for this campaign yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+    {% endif %}
+
+    {% if object.milestone_set.all %}
+        <hr>
+        <div class="roadmap-display">
+            <h3>Project Roadmap</h3>
+            <ul>
+                {% for milestone in object.milestone_set.all %}
+                <li class="{% if milestone.is_complete %}complete{% endif %}">
+                    <strong>{{ milestone.title }}</strong> (Target: {{ milestone.target_date }})
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <div class="detail-actions">
+        {% if user == object.company.owner %}
+            {% if object.status == 'Completed' %}
+                <a href="{% url 'manage_roadmap' object.id %}" class="btn">Manage Roadmap</a>
+            {% endif %}
+            <a href="{% url 'funding_update' object.id %}" class="btn">Edit Campaign</a>
+        {% elif user.is_authenticated and user.profile.role == 'Investor' %}
+            <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
