@@ -20,8 +20,6 @@ urlpatterns = [
     path('fundings/<int:funding_id>/add_investment/', views.add_investment, name='add_investment'),
     path('investment/success/', views.investment_success, name='investment_success'),
     path('investment/cancel/', views.investment_cancel, name='investment_cancel'),
-    path('investment/<int:pk>/update/', views.InvestmentUpdate.as_view(), name='investment_update'),
-    path('investment/<int:pk>/delete/', views.InvestmentDelete.as_view(), name='investment_delete'),
     # --- Roadmap & Milestone URLs ---
     path('fundings/<int:funding_id>/manage_roadmap/', views.manage_roadmap, name='manage_roadmap'),
     path('milestones/<int:milestone_id>/complete/', views.mark_milestone_complete, name='mark_milestone_complete'),
