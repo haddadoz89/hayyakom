@@ -106,7 +106,7 @@ main {
     text-decoration: none;
     color: inherit;
     display: flex;
-    /* flex: 1 1 300px; */
+    flex: 1 1 300px;
 }
 
 .card-content {
@@ -234,6 +234,7 @@ main {
     background-color: #e9ecef;
     border-radius: 0.25rem;
     margin: 0.5rem 0;
+    overflow: hidden;
 }
 
 .progress {
