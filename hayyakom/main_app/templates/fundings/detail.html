@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-{% include 'partials/messages.html' %}
 
 <div class="detail-container">
     <div class="detail-header">
@@ -86,8 +85,9 @@
             {% endif %}
             <a href="{% url 'funding_update' object.id %}" class="btn">Edit Campaign</a>
         {% elif user.is_authenticated and user.profile.role == 'Investor' %}
-            <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
-        {% endif %}
+            {% if object.status == 'In Process' %}
+                <a href="{% url 'add_investment' object.id %}" class="btn btn-success">Invest Now</a>
+            {% endif %}
     </div>
 </div>
 
