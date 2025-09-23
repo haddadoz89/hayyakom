@@ -104,11 +104,17 @@ class FundingCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.company = self.request.user.company
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        Notification.objects.create(
+            user=self.request.user,
+            message=f"Your new campaign '{self.object.campaign_name}' has been successfully submitted for admin review.",
+            related_funding=self.object
+        )
+        return response
 
 class FundingUpdate(LoginRequiredMixin, UpdateView):
     model = Funding
-    fields = ['campaign_name', 'description', 'goal', 'end_date', 'category']
+    fields = ['campaign_name', 'description', 'category']
     template_name = 'fundings/funding_form.html'
     success_url = '/fundings/'
 
@@ -373,6 +379,5 @@ def weekly_pulse(request):
 def show_interest(request, funding_id):
     if request.method == 'POST':
         funding = get_object_or_404(Funding, id=funding_id)
-        # Add the current user to the list of interested users
         funding.interested_users.add(request.user)
     return redirect('weekly_pulse')
