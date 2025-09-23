@@ -13,29 +13,24 @@
 
 <div class="card-container">
     {% for funding in fundings %}
-        <a href="{% url 'funding_detail' funding.id %}" class="card-link">
-            <div class="card">
-                <div class="card-content">
-                    <h2>{{ funding.campaign_name }}</h2>
-
-                    <a href="{% url 'company_detail' funding.company.id %}">
-                        <p class="company-name">{{ funding.company.company_name }}</p>
-                    </a>
-
-                    <p>{{ funding.description|truncatewords:20 }}</p>
-                    
-                    <div class="progress-bar">
-                        <div class="progress" style="width: {{ funding.progress_percentage }}%;"></div>
-                    </div>
-                    <div class="metrics">
-                        <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>
-                        <span>{{ funding.progress_percentage|floatformat:2 }}% Funded</span>
-                    </div>
+    <a href="{% url 'funding_detail' funding.id %}" class="card-link">
+        <div class="card">
+            <div class="card-content">
+                <h2>{{ funding.campaign_name }}</h2>
+                <p class="company-name">{{ funding.company.company_name }}</p>
+                <p>{{ funding.description|truncatewords:20 }}</p>
+                <div class="progress-bar">
+                    <div class="progress" style="width: {{ funding.progress_percentage }}%;"></div>
+                </div>
+                <div class="metrics">
+                    <span><strong>Goal:</strong> BHD {{ funding.goal }}</span>
+                    <span>{{ funding.progress_percentage|floatformat:2 }}% Funded</span>
                 </div>
             </div>
-        </a>
+        </div>
+    </a>
     {% empty %}
-        <p>No campaigns match your search criteria.</p>
+    <p>No campaigns match your search criteria.</p>
     {% endfor %}
 </div>
 
