@@ -15,7 +15,7 @@ from .models import Funding, Company, Investment, Milestone, Profile, Notificati
 from django.utils import timezone
 from datetime import timedelta
 from .forms import (
-    CompanyForm, CustomSignUpForm, InvestmentForm, UserUpdateForm, 
+    CustomSignUpForm, InvestmentForm, UserUpdateForm, 
     ProfileUpdateForm, FundingFilterForm, MilestoneForm
 )
 
@@ -24,7 +24,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 BHD_TO_USD_RATE = 2.65265
 
 # ============================================================================
-# Site Views
+# home page
 # ============================================================================
 
 def home(request):
@@ -69,21 +69,12 @@ class FundingList(LoginRequiredMixin, ListView):
             except Company.DoesNotExist:
                 return Funding.objects.none()
         else:
-            queryset = Funding.objects.filter(status='In Process', is_approved=True)
-            query = self.request.GET.get('query')
-            category = self.request.GET.get('category')
-            if query:
-                queryset = queryset.filter(
-                    Q(campaign_name__icontains=query) | Q(company__company_name__icontains=query)
-                ).distinct()
-            if category:
-                queryset = queryset.filter(category=category)
-            return queryset.order_by('-end_date')
-
+            return Funding.objects.none()
+            
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.user.profile.role == 'Investor':
-            context['form'] = FundingFilterForm(self.request.GET)
+        if self.request.user.is_authenticated and self.request.user.profile.role == 'Investor':
+            context['my_investments'] = Investment.objects.filter(investor=self.request.user).order_by('-id')
         return context
 
 class FundingDetail(DetailView):
@@ -113,7 +104,13 @@ class FundingCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.company = self.request.user.company
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        Notification.objects.create(
+            user=self.request.user,
+            message=f"Your new campaign '{self.object.campaign_name}' has been successfully submitted for admin review.",
+            related_funding=self.object
+        )
+        return response
 
 class FundingUpdate(LoginRequiredMixin, UpdateView):
     model = Funding
@@ -121,7 +118,9 @@ class FundingUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'fundings/funding_form.html'
     success_url = '/fundings/'
 
-
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(company=self.request.user.company)
 # ============================================================================
 # Company Views
 # ============================================================================
@@ -132,7 +131,7 @@ class CompanyDetail(LoginRequiredMixin, DetailView):
 
 class CompanyCreate(LoginRequiredMixin, CreateView):
     model = Company
-    form_class = CompanyForm
+    fields = ['company_name', 'cr_number']
     template_name = 'company/company_form.html'
     success_url = '/fundings/'
 
@@ -142,7 +141,7 @@ class CompanyCreate(LoginRequiredMixin, CreateView):
 
 class CompanyUpdate(LoginRequiredMixin, UpdateView):
     model = Company
-    form_class = CompanyForm
+    fields = ['company_name', 'cr_number']
     template_name = 'company/company_form.html'
     success_url = '/fundings/'
 
@@ -176,11 +175,15 @@ class CompanyDelete(LoginRequiredMixin, DeleteView):
 def add_investment(request, funding_id):
     funding = get_object_or_404(Funding, id=funding_id)
 
+    if funding.status == 'Completed':
+        messages.error(request, 'This funding campaign has already been completed and is no longer accepting investments.')
+        return redirect('funding_detail', pk=funding_id)
+
     if Investment.objects.filter(investor=request.user, funding=funding).exists():
         messages.error(request, 'You have already invested in this campaign.')
         return redirect('funding_detail', pk=funding_id)
 
-    form = InvestmentForm(request.POST or None)
+    form = InvestmentForm(request.POST or None, funding=funding)
     if request.method == 'POST':
         if form.is_valid():
             amount_in_bhd = form.cleaned_data.get('amount')
@@ -199,7 +202,7 @@ def add_investment(request, funding_id):
                     }],
                     mode='payment',
                     success_url=request.build_absolute_uri('/investment/success/') + f'?session_id={{CHECKOUT_SESSION_ID}}&funding_id={funding_id}&amount={amount_in_bhd}',
-                    cancel_url=request.build_absolute_uri(funding.get_absolute_url()),
+                    cancel_url=request.build_absolute_uri('/investment/cancel/'),
                 )
                 return redirect(checkout_session.url, code=303)
             except Exception as e:
@@ -211,21 +214,23 @@ def add_investment(request, funding_id):
 def investment_success(request):
     session_id = request.GET.get('session_id')
     funding_id = request.GET.get('funding_id')
-    amount = request.GET.get('amount')
+    amount_str = request.GET.get('amount')
     
     try:
         session = stripe.checkout.Session.retrieve(session_id)
+        
         if session.payment_status == 'paid':
             if not Investment.objects.filter(investor=request.user, funding_id=funding_id).exists():
                 funding = get_object_or_404(Funding, id=funding_id)
+                current_total_invested = funding.total_invested()
+                new_investment_amount = int(amount_str)
                 new_investment = Investment.objects.create(
                     investor=request.user,
                     funding=funding,
-                    amount=int(amount)
+                    amount=new_investment_amount
                 )
-                
                 owner = funding.company.owner
-                investor_name = request.user.first_name or request.user.username
+                investor_name = request.user.first_name
                 Notification.objects.create(
                     user=owner,
                     message=f"{investor_name} invested {new_investment.amount} BD in your campaign '{funding.campaign_name}'.",
@@ -236,11 +241,17 @@ def investment_success(request):
                     message=f"Thank you! Your investment of {new_investment.amount} BD in '{funding.campaign_name}' has been confirmed.",
                     related_funding=funding
                 )
-                messages.success(request, 'Your investment was successful!')
+                new_total = current_total_invested + new_investment_amount
+
+                if new_total >= funding.goal and funding.status != 'Completed':
+                    funding.status = 'Completed'
+                    funding.save()
+                else:
+                    messages.success(request, 'Your investment was successful!')
             else:
                 messages.info(request, 'This investment has already been recorded.')
         else:
-            messages.error(request, 'Payment was not successful. Please try again.')
+            messages.error(request, 'Payment was not successful. Please try again.')   
     except Exception as e:
         messages.error(request, f"An error occurred while verifying your payment: {e}")
 
@@ -248,38 +259,6 @@ def investment_success(request):
 
 def investment_cancel(request):
     return render(request, 'investment/cancel.html')
-
-class InvestmentUpdate(LoginRequiredMixin, UpdateView):
-    model = Investment
-    form_class = InvestmentForm
-    template_name = 'investment/investment_form.html'
-    success_url = '/fundings/'
-
-    def get_queryset(self):
-        return super().get_queryset().filter(investor=self.request.user)
-    
-    def dispatch(self, request, *args, **kwargs):
-        investment = self.get_object()
-        if investment.funding.status != 'In Process':
-            messages.error(request, 'This investment cannot be modified as the campaign is no longer active.')
-            return redirect('funding_list')
-        return super().dispatch(request, *args, **kwargs)
-
-class InvestmentDelete(LoginRequiredMixin, DeleteView):
-    model = Investment
-    template_name = 'investment/investment_confirm_delete.html'
-    success_url = '/fundings/'
-
-    def get_queryset(self):
-        return super().get_queryset().filter(investor=self.request.user)
-
-    def dispatch(self, request, *args, **kwargs):
-        investment = self.get_object()
-        if investment.funding.status != 'In Process':
-            messages.error(request, 'This investment cannot be deleted as the campaign is no longer active.')
-            return redirect('funding_list')
-        return super().dispatch(request, *args, **kwargs)
-
 
 # ============================================================================
 # User & Profile Views
@@ -400,6 +379,5 @@ def weekly_pulse(request):
 def show_interest(request, funding_id):
     if request.method == 'POST':
         funding = get_object_or_404(Funding, id=funding_id)
-        # Add the current user to the list of interested users
         funding.interested_users.add(request.user)
     return redirect('weekly_pulse')
