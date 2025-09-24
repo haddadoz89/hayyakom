@@ -39,7 +39,7 @@ Payments can be made directly through an integrated payment channel, allowing in
 - Simple and clean user interface design  
 - Python backend for handling logic  
 - Responsive layout that works across devices  
-- Organized HTML and CSS for easy customization  
+- Organized HTML and CSS for easy customization 
 
 ---
 
@@ -95,13 +95,27 @@ Payments can be made directly through an integrated payment channel, allowing in
 
 ```
 hayyakom/
-├── templates/        # HTML templates
-├── static/           # CSS / Images / JS files
-├── src/              # Python backend code
+├── .env              # Local environment variables (must be created)
+├── hayyakom/         # Django project configuration files (settings.py, urls.py)
+├── main_app/         # The core application logic, models, views, and templates
+├── manage.py         # Django's command-line utility
 ├── README.md         
-├── requirements.txt  # Project dependencies
-└── ...               # Other files
-
+└── requirements.txt  # A list of all Python package dependencies
+```
 ---
+## 🖥️ URL & Page Overview
 
-## Deployment
+* **`/` (Home Page):** A public, searchable, and filterable list of all active and approved campaigns.
+* **`/accounts/signup/`:** New user registration form with role selection (Owner or Investor).
+* **`/accounts/login/`:** User login page.
+* **`/fundings/` (Dashboard):** A protected, personalized dashboard.
+    * **For Owners:** Shows their company profile and a link to manage their campaigns.
+    * **For Investors:** Shows a table of their personal investments and their status.
+* **`/fundings/<id>/` (Campaign Detail):** A detailed view of a single campaign, showing its description, funding progress, and the interactive roadmap.
+* **`/company/<id>/` (Company Detail):** A public profile for a company, showing its details and a list of all its campaigns.
+* **`/profile/`:** A private page for a logged-in user to update their personal information.
+* **`/passport/`:** An investor's private "trophy case" of successfully backed campaigns.
+
+## Future Enhancements
+- **The "Hayyakom Guild":** A private marketplace connecting funded businesses with skilled investors offering professional services.
+- **Terms of Service & Public Q&A:** Add legal pages and a public Q&A section on campaign pages to increase trust and transparency.
