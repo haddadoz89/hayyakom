@@ -1,126 +1,107 @@
-Hayyakom - Investment Crowdfunding Platform
-A full-stack crowdfunding platform built with Django, designed to connect small and medium-sized business owners in Bahrain with a network of local investors. Hayyakom facilitates the entire funding lifecycle, from campaign creation and admin approval to secure online payments and post-funding progress tracking.
+# Hayyakom
 
-✨ Features
-Role-Based User System: Separate, tailored experiences for Business Owners and Investors.
+## Overview
+`Hayyakom` is a web project built with Python, HTML, and CSS.  
+The purpose of this project is to provide a clean and simple web interface for users. 
 
-Secure Authentication: Full user signup, login/logout, profile management, and password reset functionality.
+## Screenshots  
+![campaign_information_investor](https://github.com/user-attachments/assets/0b0ce20b-4ee3-450a-afa3-792ce05bff33)
 
-Admin Approval Workflow: A secure process where administrators must approve new campaigns before they are visible to the public.
+## ِ About Hayyakom
+This platform connects individuals who are interested in investing in **small and medium-sized projects** with projects proposed by **business owners and users**.
 
-Secure Payments: Integration with the Stripe payment gateway for handling real financial transactions in a test environment.
+Payments can be made directly through an integrated payment channel, allowing investors to purchase shares with:
+- **Minimum investment**: 2,000 BHD
+- **Maximum investment**: 5,000 BHD
 
-Dynamic Dashboards: Personalized dashboards for both owners and investors to manage their activities.
+---
 
-Interactive Roadmaps: A unique post-funding feature where owners can add and complete milestones, which automatically notifies investors.
+## User Roles & Features
 
-The Investor Passport: A "trophy case" feature that displays a digital stamp for every successfully funded campaign an investor has backed.
+### Investors
+- Register on the platform as an investor.
+- Browse currently available projects or upcoming ones to express interest.
+- Make payments directly through the **Stripe** payment channel.
+- Access project owner details after completing a payment.
 
-Automated Lifecycle Management: A daily script automatically updates the status of campaigns that have reached their end date.
+### Project Owners / Companies
+- Register on the platform by creating a company profile, including:
+  - Commercial registration number
+  - Project name
+  - Target campaign amount
+- Once the project is approved and published:
+  - View investor details and corresponding investment amounts on the campaign page.
+- Edit campaign details after publication, **except** for the target amount (which cannot be changed once approved).
 
-In-App Notifications: A notification system to keep users informed of key events like new investments, campaign approvals, and milestone completions.
+---
 
-Search & Filtering: Powerful search and category filtering on public campaign lists.
+## Features
+- Simple and clean user interface design  
+- Python backend for handling logic  
+- Responsive layout that works across devices  
+- Organized HTML and CSS for easy customization  
 
-🧱 Tech Stack
-Backend: Django, PostgreSQL
+---
 
-Payments: Stripe
+## 📌 Key Links
+- **Figma Wireframe**: [View Design](https://www.figma.com/design/Duf0QtyIc9JFoXCGqwpI0R/hayyakom?node-id=8-32&t=U0Wb9db4h9humufb-1)  
+- **Trello Board**: [Project Management](https://trello.com/invite/b/68d2f87fbbc41b563f787829/ATTIb55793a50ce5f5b4a30242f8b326987976D09F73/hayyakom)
 
-Environment Variables: python-decouple, python-dotenv
 
-Database Driver: psycopg2-binary
+---
 
-Frontend: HTML, CSS (with a mobile-first responsive design), JavaScript
+## Technologies Used
+| Technology | Purpose |
+|---|---|
+| Python | Backend logic/server |
+| HTML | Page structure |
+| CSS | Styling and design |
 
-JavaScript Libraries: flatpickr (for date selection)
+---
 
-🗂️ Repository Structure
-hayyakom_project/
-├── .env              # Local environment variables (must be created)
-├── hayyakom/         # Django project configuration files (settings.py, urls.py)
-├── main_app/         # The core application logic, models, views, and templates
-├── manage.py         # Django's command-line utility
-└── requirements.txt  # A list of all Python package dependencies
+## Getting Started (Local Setup)
 
-🖥️ URL & Page Overview
-/ (Home Page): A public, searchable, and filterable list of all active and approved campaigns.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/haddadoz89/hayyakom.git
+   ```
 
-/accounts/signup/: New user registration form with role selection (Owner or Investor).
+2. Navigate to the project directory:
+   ```bash
+   cd hayyakom
+   ```
 
-/accounts/login/: User login page.
+3. Ensure Python is installed. It's recommended to use a **virtual environment**:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Unix/macOS
+   venv\Scripts\activate   # On Windows
+   ```
 
-/fundings/ (Dashboard): A protected, personalized dashboard.
+4. Run the project locally:
+   ```bash
+   python manage.py runserver
+   ```
 
-For Owners: Shows their company profile and a link to manage their campaigns.
+5. Open your browser at:
+   ```
+   http://127.0.0.1:8000
+   ```
+   (or whichever port the project is running on)
 
-For Investors: Shows a table of their personal investments and their status.
+---
 
-/fundings/<id>/ (Campaign Detail): A detailed view of a single campaign, showing its description, funding progress, and the interactive roadmap.
+## Project Structure
 
-/company/<id>/ (Company Detail): A public profile for a company, showing its details and a list of all its campaigns.
+```
+hayyakom/
+├── templates/        # HTML templates
+├── static/           # CSS / Images / JS files
+├── src/              # Python backend code
+├── README.md         
+├── requirements.txt  # Project dependencies
+└── ...               # Other files
 
-/profile/: A private page for a logged-in user to update their personal information.
+---
 
-/passport/: An investor's private "trophy case" of successfully backed campaigns.
-
-/admin/: The powerful, customized Django Admin panel for site administrators to manage users and approve campaigns.
-
-🚀 Getting Started
-To get a local copy up and running, follow these steps.
-
-Prerequisites
-Python 3.10+
-
-PostgreSQL
-
-Installation & Setup
-Clone the repository:
-
-git clone <your-repo-url>
-cd hayyakom_project
-
-Create and activate a virtual environment:
-
-python -m venv .venv
-source .venv/bin/activate
-
-Install all dependencies:
-
-pip install -r requirements.txt
-
-Set up the .env file:
-Create a new file named .env in the project root and add your secret keys.
-
-SECRET_KEY=your_django_secret_key
-DEBUG=True
-DATABASE_NAME=hayyakomdb
-DATABASE_USER=your_postgres_username
-DATABASE_PASSWORD=your_postgres_password
-DATABASE_PORT=5432
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-
-Set up the PostgreSQL Database:
-Make sure PostgreSQL is running and create the database.
-
-createdb hayyakomdb
-
-Run the Database Migrations:
-
-python manage.py migrate
-
-Create an Admin Superuser:
-
-python manage.py createsuperuser
-
-Run the Development Server:
-
-python manage.py runserver
-
-Future Enhancements
-"Lead Investor" Syndicates: Allow reputable investors to publicly back and lead investment rounds to increase trust.
-
-The "Hayyakom Guild": A private marketplace connecting funded businesses with skilled investors offering professional services.
-
-Terms of Service & Public Q&A: Add legal pages and a public Q&A section on campaign pages to increase transparency.
+## Deployment
